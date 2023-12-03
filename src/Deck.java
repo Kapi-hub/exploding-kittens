@@ -1,21 +1,17 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 public class Deck {
     private static final int CARD_INSTANCES_FOUR = 4;
     private static final int CARD_INSTANCES_FIVE = 5;
     private static final int CARD_INSTANCES_SIX = 6;
-    private static final int CARD_INSTANCES_DEFUSES = 6;
-
+    // Set to ArrayList because there is no intention of switching it to another implementation later on.
     private ArrayList<Card> deck = new ArrayList<>();
 
     /* ************************************
               GETTERS & SETTERS
     ************************************ */
 
-    public ArrayList<Card> getDeck() {
+     public ArrayList<Card> getDeckAsArrayList() {
         return deck;
     }
 
@@ -26,16 +22,10 @@ public class Deck {
     public Deck() {
         this.deck = generateDeck();
     }
+
     /* ************************************
                     METHODS
     ************************************ */
-
-    // TO BE IMPLEMENTED
-    public ArrayList<Card> setUpDeck(int numberOfPlayers) {
-        for (int cardInstance = 0; cardInstance < CARD_INSTANCES_DEFUSES; cardInstance++ ) {
-        }
-        return null;
-    }
 
     /**
      * Generates a deck of 56 cards for the game.
@@ -75,6 +65,12 @@ public class Deck {
         return deck;
     }
 
+    public Card getLastCard() {
+        Card lastCardFromDeck = deck.get(deck.size() - 1);
+        deck.remove(deck.size() - 1);
+        return lastCardFromDeck;
+    }
+
     @Override
     public String toString() {
         String result = "";
@@ -86,6 +82,6 @@ public class Deck {
 
     public static void main(String[] args) {
         Deck deck = new Deck();
-        System.out.println(deck.getDeck().size());
+        System.out.println(deck.getDeckAsArrayList().size());
     }
 }
