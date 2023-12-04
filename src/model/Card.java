@@ -1,3 +1,4 @@
+package model;
 
 // Noun because of interface polymorphism, exactly as the convention says.
 public interface Card {

@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.*;
+import model.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
