@@ -1,6 +1,5 @@
 package model;
 
-// Noun because of interface polymorphism, exactly as the convention says.
 public interface Card {
     enum SpecialCard implements Card {
         EXPLODE,
@@ -10,7 +9,7 @@ public interface Card {
         NOPE,
         SHUFFLE,
         SKIP,
-        FUTURE;
+        FUTURE
     }
 
     enum RegularCard implements Card {

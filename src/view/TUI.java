@@ -1,7 +1,5 @@
 package view;
 
-import java.sql.SQLOutput;
-
 public class TUI {
     public static void promptStartGameMenu() {
         System.out.println("[!] Welcome, this is a game of Exploding Kittens.");
