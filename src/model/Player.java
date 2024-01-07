@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Player {
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND = 8;
@@ -37,10 +38,6 @@ public class Player {
                     METHODS
     ************************************ */
 
-//    public Card doMove() {
-//
-//
-//    }
 
     @Override
     public String toString() {

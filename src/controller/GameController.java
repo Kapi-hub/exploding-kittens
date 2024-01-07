@@ -30,18 +30,18 @@ public class GameController {
     public static void startGame() {
         players = new ArrayList<>();
         TUI.promptStartGameMenu();
-        decisionOfHowToPlay = userInput.nextInt();
+        decisionOfHowToPlay = Integer.parseInt(userInput.nextLine());
         switch (decisionOfHowToPlay) {
             case HUMAN_PLAYING:
                 TUI.promptStartGameWithHumanAndComputers();
-                numberOfComputerPlayers = userInput.nextInt();
+                numberOfComputerPlayers = Integer.parseInt(userInput.nextLine());
                 TUI.promptConfirmationOfPlayersWhenHumanPlaying
                         (numberOfComputerPlayers);
                 players.add(new HumanPlayer("You"));
                 break;
             case COMPUTERS_PLAYING:
                 TUI.promptStartGameWithComputers();
-                numberOfComputerPlayers = userInput.nextInt();
+                numberOfComputerPlayers = Integer.parseInt(userInput.nextLine());
                 TUI.promptConfirmationOfPlayersWhenComputersPlaying
                         (numberOfComputerPlayers);
                 break;
@@ -57,33 +57,30 @@ public class GameController {
         game.setUp();
     }
 
-    public static void doMove(String move) {
-        commands = new ArrayList<>(Arrays.asList(move.split(" ")));
-        String playOrDraw = commands.get(0).toLowerCase();
-        switch (playOrDraw) {
-            case "play":
-
-                break;
-            case "draw":
-                break;
-        }
-    }
-
     public static void continueGame() {
         gameHasWinner = false;
         move = "";
-        do {
+        Player currentPlayer;
+        while(!gameHasWinner) {
             TUI.promptDeck(
                     game.getDeckObject().getDeckAsArrayList().size());
             TUI.promptDiscardPile(game.getDiscardPile());
             game.getPlayers().forEach(player -> TUI.promptPlayerHand(
                             player.getName(),
                             player.getHand()));
-            TUI.promptInput();
-            move = userInput.nextLine();
-            doMove(move);
-        } while(!gameHasWinner);
 
+            currentPlayer = game.getPlayers().get(game.getPlayerIndexToMakeMove());
+
+            if (currentPlayer instanceof HumanPlayer) {
+                TUI.promptInput();
+                move = userInput.nextLine();
+                ((HumanPlayer) currentPlayer).doMove(move, game);
+            }
+            else {
+                ((ComputerPlayer) currentPlayer).doMove(game);
+            }
+            game.setPlayerIndexToMakeMove();
+        }
     }
 
     public static void main(String[] args) {

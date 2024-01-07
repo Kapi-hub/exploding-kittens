@@ -1,15 +1,17 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class Game {
     private Deck deck;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<Card> discardPile;
+    private int playerIndexToMakeMove;
 
     private final int NUMBER_OF_PLAYERS;
-    private final int indexOfPlayerToPlayFirst;
 
     /* ************************************
               GETTERS & SETTERS
@@ -18,8 +20,17 @@ public class Game {
         return deck;
     }
 
-    public int getIndexOfPlayerToPlayFirst() {
-        return indexOfPlayerToPlayFirst;
+    public int getPlayerIndexToMakeMove() {
+        return playerIndexToMakeMove;
+    }
+
+    public void setPlayerIndexToMakeMove() {
+        int copy = playerIndexToMakeMove + 2;
+        if (copy <= NUMBER_OF_PLAYERS)
+            playerIndexToMakeMove++; // 1
+        else {
+            playerIndexToMakeMove = 0;
+        }
     }
 
     public ArrayList<Player> getPlayers() {
@@ -41,7 +52,7 @@ public class Game {
     public Game(ArrayList<Player> players) {
         players.forEach(player -> this.players.add(player));
         NUMBER_OF_PLAYERS =  this.players.size();
-        indexOfPlayerToPlayFirst = (int) (Math.random() * NUMBER_OF_PLAYERS);
+        playerIndexToMakeMove = (int) (Math.random() * NUMBER_OF_PLAYERS);
         deck = new Deck();
         discardPile = new ArrayList<>();
     }
@@ -118,17 +129,18 @@ public class Game {
      * is a human or a bot.
      * @param move
      */
-//    public static void doAction(String move) {
-//        commands = new ArrayList<>(Arrays.asList(move.split(" ")));
-//        String playOrDraw = commands.get(0).toLowerCase();
-//        switch (playOrDraw) {
-//            case "play":
-//
-//                break;
-//            case "draw":
-//                break;
-//        }
-//    }
+    public static void doMove(String move) {
+        List<String> commands = new ArrayList<>(Arrays.asList(move.split(" ")));
+        String playOrDraw = commands.get(0).toLowerCase();
+        switch (playOrDraw) {
+            case "play":
+                String card = commands.get(1).toUpperCase();
+
+                break;
+            case "draw":
+                break;
+        }
+    }
 
     public static void main(String[] args) {
         ArrayList<Player> players = new ArrayList<>();
