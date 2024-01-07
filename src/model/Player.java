@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Player {
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND = 8;
@@ -16,7 +17,10 @@ public class Player {
         return this.handOfCards;
     }
 
-    /* ************************************
+    public String getName() {
+        return name;
+    }
+/* ************************************
                 CONSTRUCTORS
     ************************************ */
 
@@ -32,6 +36,11 @@ public class Player {
     /* ************************************
                     METHODS
     ************************************ */
+
+//    public Card doMove() {
+//
+//
+//    }
 
     @Override
     public String toString() {

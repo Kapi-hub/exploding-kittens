@@ -6,6 +6,7 @@ import java.util.Collections;
 public class Game {
     private Deck deck;
     private ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<Card> discardPile;
 
     private final int NUMBER_OF_PLAYERS;
     private final int indexOfPlayerToPlayFirst;
@@ -27,6 +28,8 @@ public class Game {
 
     public int getNUMBER_OF_PLAYERS() { return NUMBER_OF_PLAYERS; }
 
+    public ArrayList<Card> getDiscardPile() { return discardPile; }
+
     /* ************************************
                 CONSTRUCTORS
     ************************************ */
@@ -40,6 +43,7 @@ public class Game {
         NUMBER_OF_PLAYERS =  this.players.size();
         indexOfPlayerToPlayFirst = (int) (Math.random() * NUMBER_OF_PLAYERS);
         deck = new Deck();
+        discardPile = new ArrayList<>();
     }
 
     /* ************************************
@@ -94,7 +98,7 @@ public class Game {
         }
         Collections.shuffle(deck.getDeckAsArrayList());
         for (int cardIndex = 0; cardIndex < Player.MAX_NUMBER_OF_CARDS_IN_HAND_WITHOUT_DEFUSE; cardIndex++) {
-            players.forEach(player -> player.getHand().add(deck.getLastCard()));
+            players.forEach(player -> player.getHand().add(deck.getLastCardAndRemove()));
         }
     }
 
@@ -109,22 +113,39 @@ public class Game {
         Collections.shuffle(deck.getDeckAsArrayList());
     }
 
+    /**
+     * Performs the move that the player makes, whether the player
+     * is a human or a bot.
+     * @param move
+     */
+//    public static void doAction(String move) {
+//        commands = new ArrayList<>(Arrays.asList(move.split(" ")));
+//        String playOrDraw = commands.get(0).toLowerCase();
+//        switch (playOrDraw) {
+//            case "play":
+//
+//                break;
+//            case "draw":
+//                break;
+//        }
+//    }
+
     public static void main(String[] args) {
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player("BOT"));
         players.add(new Player("Alex"));
-        players.add(new Player("BOT"));
-        players.add(new Player("Mircea"));
+//        players.add(new Player("BOT"));
+//        players.add(new Player("Mircea"));
         Game game = new Game(players);
         game.setUp();
 
         System.out.println(players.get(0) + " " + game.players.get(0).getHand());
         System.out.println(players.get(1) + " " + game.players.get(1).getHand());
-        System.out.println(players.get(2) + " " + game.players.get(2).getHand());
-        System.out.println(players.get(3) + " " + game.players.get(3).getHand());
+//        System.out.println(players.get(2) + " " + game.players.get(2).getHand());
+//        System.out.println(players.get(3) + " " + game.players.get(3).getHand());
 
+        System.out.println(game.deck.getDeckAsArrayList().size());
         System.out.println(game.deck.getDeckAsArrayList());
-
     }
 
 }

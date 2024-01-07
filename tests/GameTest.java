@@ -34,7 +34,7 @@ class GameTest {
 
     @Test
     @DisplayName("Tests if the object is not null && of type Deck.")
-    // Whole deck is tedted in class TestDeck.
+    // Whole deck is tested in class TestDeck.
     void getDeckObject() {
         assertNotNull(game.getDeckObject(), "Deck object is null.");
         assertTrue(game.getDeckObject() instanceof Deck, "deck is not" +
@@ -133,4 +133,5 @@ class GameTest {
                 game2.getDeckObject().getDeckAsArrayList(),
                 Card.SpecialCard.EXPLODE));
     }
+
 }

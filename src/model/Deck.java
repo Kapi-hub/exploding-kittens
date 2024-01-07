@@ -68,6 +68,10 @@ public class Deck {
     }
 
     public Card getLastCard() {
+        return deck.get(deck.size() - 1);
+    }
+
+    public Card getLastCardAndRemove() {
         Card lastCardFromDeck = deck.get(deck.size() - 1);
         deck.remove(deck.size() - 1);
         return lastCardFromDeck;
