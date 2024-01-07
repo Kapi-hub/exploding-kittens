@@ -62,9 +62,6 @@ public class TUI {
     public static void promptDiscardPile(ArrayList<Card> discardPile) {
         System.out.print("Discard pile : ");
         discardPile.forEach(card -> System.out.print("| " +card.toString() + " | "));
-        discardPile.add(Card.RegularCard.BEARD);
-        discardPile.add(Card.RegularCard.POTATO);
-        discardPile.add(Card.RegularCard.CATTERMELLON);
         System.out.print("\n\n");
     }
 
