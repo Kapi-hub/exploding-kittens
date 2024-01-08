@@ -43,15 +43,13 @@ public class TUI {
     public static void promptConfirmationOfPlayersWhenHumanPlaying(int numberOfPlayers) {
         promptDelimiter();
         System.out.println("[!] You have decided to play with " + numberOfPlayers
-        + " computer players.");
-        System.out.println("[!] Press any key to continue.");
+        + " computer player(s).");
         promptDelimiter();
     }
 
     public static void promptConfirmationOfPlayersWhenComputersPlaying(int numberOfPlayers) {
         promptDelimiter();
         System.out.println("[!] There will be " + numberOfPlayers + " computer player(s).");
-        System.out.println("[!] Press any key to continue.");
         promptDelimiter();
     }
 
@@ -69,5 +67,28 @@ public class TUI {
         System.out.println(String.format("%-6s: %s", playerName, playerHand));
     }
 
+    public static void promptInsertBackExplode(int lastDeckCardIndex) {
+        System.out.println("\n[!] " + "You drew an EXPLODE card.");
+        System.out.println("[!] " + "Write an index from 0 to " +
+                lastDeckCardIndex + " (including) to insert back the EXPLODE card");
+    }
+
+    public static void promptExplodeDefuse(String playerName) {
+        System.out.println("[!] " + playerName + " drew an EXPLODE card, but he/she had a DEFUSE.");
+        System.out.println("[!] " + playerName + " inserted into the deck the EXPLODE card wherever he/she preferred.");
+    }
+
+    public static void informWinner(String name) {
+        System.out.println(name + " won!");
+    }
+
+    public static void promptKickExplodeNoDefuse(String name) {
+        System.out.println('\n' + name + " has been kicked since the player " +
+                "drew an EXPLODE and did not have any DEFUSE card.");
+    }
+
+    public static void raiseWarningWrongInput(String illegalMove) {
+        System.out.println("Illegal move: " + illegalMove);
+    }
 
 }

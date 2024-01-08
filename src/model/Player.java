@@ -38,9 +38,9 @@ public class Player {
                     METHODS
     ************************************ */
 
-
     @Override
     public String toString() {
         return (this.name + ": ");
     }
+
 }

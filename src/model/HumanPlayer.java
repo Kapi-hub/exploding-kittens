@@ -15,20 +15,45 @@ public class HumanPlayer extends Player {
 
 
     /**
-     * Performs the move that the player makes, whether the player
-     * is a human or a bot.
-     * @param move
+//     * Performs the move that the player makes, whether the player
+//     * is a human or a bot.
+//     * @param move
+//     */
+//    public Card doMove(String move, Game game) {
+//        List<String> commands = new ArrayList<>(Arrays.asList(move.split(" ")));
+//        String playOrDraw = commands.get(0).toLowerCase();
+//        switch (playOrDraw) {
+//            case "play":
+//                Card card = Card.valueOf(commands.get(1).toUpperCase());
+//                return processCard(card, game);
+//            case "draw":
+//                return super.draw(game);
+//        }
+//        return null;
+//    }
+
+    /**
+     * Private because it is accessed by doMove()
      */
-    public void doMove(String move, Game game) {
-        List<String> commands = new ArrayList<>(Arrays.asList(move.split(" ")));
-        String playOrDraw = commands.get(0).toLowerCase();
-        switch (playOrDraw) {
-            case "play":
-                Card card = Card.SpecialCard.valueOf(commands.get(1).toUpperCase());
-            break;
-            case "draw":
-                this.handOfCards.add(game.getDeckObject().getLastCardAndRemove());
+    private Card processCard(Card card, Game game) {
+        switch (card) {
+            case ATTACK:
+                System.out.println("yes");
                 break;
+            case FAVOR:
+                break;
+            case NOPE:
+                System.out.println("yes");
+                break;
+            case SHUFFLE:
+                break;
+            case SKIP:
+                break;
+            case FUTURE:
+                System.out.println("yes");
+                break;
+
         }
+        return null;
     }
 }

@@ -13,7 +13,7 @@ public class Deck {
               GETTERS & SETTERS
     ************************************ */
 
-     public ArrayList<Card> getDeckAsArrayList() {
+     public ArrayList<Card> getDeckArray() {
         return deck;
     }
 
@@ -41,27 +41,27 @@ public class Deck {
     public ArrayList<Card> generateDeck() {
         // Generate the cards that have 4 instances in the deck. There are 10 such types of cards.
         for (int cardInstance = 0; cardInstance < CARD_INSTANCES_FOUR; cardInstance++) { // 4 instances of each card.
-            deck.add(Card.SpecialCard.EXPLODE);
-            deck.add(Card.SpecialCard.ATTACK);
-            deck.add(Card.SpecialCard.SKIP);
-            deck.add(Card.SpecialCard.FAVOR);
-            deck.add(Card.SpecialCard.SHUFFLE);
-            deck.add(Card.RegularCard.TACOCAT);
-            deck.add(Card.RegularCard.CATTERMELLON);
-            deck.add(Card.RegularCard.POTATO);
-            deck.add(Card.RegularCard.BEARD);
-            deck.add(Card.RegularCard.RAINBOW);
+            deck.add(Card.EXPLODE);
+            deck.add(Card.ATTACK);
+            deck.add(Card.SKIP);
+            deck.add(Card.FAVOR);
+            deck.add(Card.SHUFFLE);
+            deck.add(Card.TACOCAT);
+            deck.add(Card.CATTERMELLON);
+            deck.add(Card.POTATO);
+            deck.add(Card.BEARD);
+            deck.add(Card.RAINBOW);
         }
 
         // Generate the cards that have 5 instances in the deck. There are 2 such types of cards.
         for (int cardInstance = 0; cardInstance < CARD_INSTANCES_FIVE; cardInstance++) {
-            deck.add(Card.SpecialCard.FUTURE);
-            deck.add(Card.SpecialCard.NOPE);
+            deck.add(Card.FUTURE);
+            deck.add(Card.NOPE);
         }
 
         // Generate the cards that have 6 instances in the deck. There are 1 such types of card.
         for (int cardInstance = 0; cardInstance < CARD_INSTANCES_SIX; cardInstance++) {
-            deck.add(Card.SpecialCard.DEFUSE);
+            deck.add(Card.DEFUSE);
         }
         Collections.shuffle(deck);
         return deck;
@@ -88,6 +88,6 @@ public class Deck {
 
     public static void main(String[] args) {
         Deck deck = new Deck();
-        System.out.println(deck.getDeckAsArrayList().size());
+        System.out.println(deck.getDeckArray().size());
     }
 }

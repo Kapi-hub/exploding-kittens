@@ -1,6 +1,13 @@
 package model;
 
 public class ComputerPlayer extends Player {
+    /**
+     * The computer is developed such that it knows only the:
+     *  - number of cards in deck
+     *  - cards played in the game
+     *  It might do card counting, depending on how much time I have.
+     * @param name
+     */
     public ComputerPlayer(String name) {
         super(name);
     }
@@ -8,7 +15,7 @@ public class ComputerPlayer extends Player {
         super();
     }
 
-    public void doMove(Game game) {
-        this.handOfCards.add(game.getDeckObject().getLastCardAndRemove());
+    public String doMove(Game game) {
+        return "draw";
     }
 }

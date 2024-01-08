@@ -1,13 +1,9 @@
 package controller;
 
-import model.ComputerPlayer;
-import model.Game;
-import model.HumanPlayer;
-import model.Player;
+import model.*;
 import view.TUI;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class GameController {
@@ -25,6 +21,7 @@ public class GameController {
     private static Game game;
     private static ArrayList<Player> players;
     private static ArrayList<String> commands;
+    private static Player currentPlayer;
 
 
     public static void startGame() {
@@ -37,7 +34,7 @@ public class GameController {
                 numberOfComputerPlayers = Integer.parseInt(userInput.nextLine());
                 TUI.promptConfirmationOfPlayersWhenHumanPlaying
                         (numberOfComputerPlayers);
-                players.add(new HumanPlayer("You"));
+                players.add(new HumanPlayer("Alex"));
                 break;
             case COMPUTERS_PLAYING:
                 TUI.promptStartGameWithComputers();
@@ -60,27 +57,66 @@ public class GameController {
     public static void continueGame() {
         gameHasWinner = false;
         move = "";
-        Player currentPlayer;
-        while(!gameHasWinner) {
+        while (!gameHasWinner) {
             TUI.promptDeck(
-                    game.getDeckObject().getDeckAsArrayList().size());
+                    game.getDeckObject().getDeckArray().size());
             TUI.promptDiscardPile(game.getDiscardPile());
             game.getPlayers().forEach(player -> TUI.promptPlayerHand(
-                            player.getName(),
-                            player.getHand()));
+                    player.getName(),
+                    player.getHand()));
+            TUI.promptDelimiter();
+            currentPlayer = game.getPlayers().get(game.getCurrentPlayerTurnIndex());
+            askAndSendInputForProcessing();
 
-            currentPlayer = game.getPlayers().get(game.getPlayerIndexToMakeMove());
-
-            if (currentPlayer instanceof HumanPlayer) {
-                TUI.promptInput();
-                move = userInput.nextLine();
-                ((HumanPlayer) currentPlayer).doMove(move, game);
-            }
-            else {
-                ((ComputerPlayer) currentPlayer).doMove(game);
-            }
-            game.setPlayerIndexToMakeMove();
+            game.incrementPlayerTurnIndex();
         }
+    }
+
+    public static void askAndSendInputForProcessing() {
+        if (currentPlayer instanceof HumanPlayer) {
+            move = askForStringInput();
+            game.processMove(move);
+        } else {
+            move = ((ComputerPlayer) currentPlayer).doMove(game);
+            game.processMove(move);
+        }
+    }
+
+    public static int askIndexOfReinsertingExplode() {
+        int desiredIndex;
+        int lastDeckCardIndex;
+        if (currentPlayer instanceof HumanPlayer) {
+            lastDeckCardIndex = game.getDeckObject().getDeckArray().size() - 1;
+            TUI.promptInsertBackExplode(lastDeckCardIndex);
+            desiredIndex = askForIntInput();
+            TUI.promptDelimiter();
+            return desiredIndex;
+        } else {
+            return (game.getDeckObject().getDeckArray().size() - 1);
+        }
+    }
+
+    public static void informPlayerKick() {
+        TUI.promptKickExplodeNoDefuse(currentPlayer.getName());
+    }
+
+    public static void informWinner() {
+        TUI.informWinner(game.getPlayers().get(0).getName());
+    }
+
+    public static int askForIntInput() {
+        TUI.promptInput();
+        return Integer.parseInt(userInput.nextLine());
+    }
+
+    public static String askForStringInput() {
+            TUI.promptInput();
+            return userInput.nextLine();
+    }
+
+    public static void raiseWarningWrongInput(String illegalMove) {
+        TUI.raiseWarningWrongInput(illegalMove);
+        askAndSendInputForProcessing();
     }
 
     public static void main(String[] args) {

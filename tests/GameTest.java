@@ -44,9 +44,9 @@ class GameTest {
     @Test
     @DisplayName("Tests if 0 <= index of starting player <= number of players")
     void getIndexOfPlayerToPlayFirst() {
-        assertTrue(game.getIndexOfPlayerToPlayFirst() >= 0,
+        assertTrue(game.getCurrentPlayerTurnIndex() >= 0,
                 "Index of player to start is less than 1!");
-        assertTrue(game.getIndexOfPlayerToPlayFirst()
+        assertTrue(game.getCurrentPlayerTurnIndex()
                 <= game.getNUMBER_OF_PLAYERS(),
                 "Index of player to start is bigger than the number of " +
                         "players.");
@@ -69,7 +69,7 @@ class GameTest {
     void removeExplodeAndDefuseCards() {
         game.removeExplodeAndDefuseCards();
         assertEquals(MAX_NUMBER_OF_CARDS_IN_DECK - 4 - 6,
-                game.getDeckObject().getDeckAsArrayList().size(),
+                game.getDeckObject().getDeckArray().size(),
                 "Number of remaining cards is different than 46.");
     }
 
@@ -81,7 +81,7 @@ class GameTest {
         game.dealCardsToPlayers();
 
         List<Player> playersWithDefuse = players.stream()
-                .filter(player -> player.getHand().contains(Card.SpecialCard.DEFUSE))
+                .filter(player -> player.getHand().contains(Card.DEFUSE))
                 .collect(Collectors.toList());
 
         assertEquals(players.size(), playersWithDefuse.size(),
@@ -94,8 +94,8 @@ class GameTest {
              distributing the cards.
          */
         assertTrue(Collections.frequency(
-                game.getDeckObject().getDeckAsArrayList(),
-                Card.SpecialCard.DEFUSE) <= 2,
+                game.getDeckObject().getDeckArray(),
+                Card.DEFUSE) <= 2,
                 "There are less or more than 2 DEFUSE cards in the deck.");
 
         for (Player player : players)
@@ -109,8 +109,8 @@ class GameTest {
         game2.dealCardsToPlayers();
 
         assertTrue(Collections.frequency(
-                game2.getDeckObject().getDeckAsArrayList(),
-                Card.SpecialCard.DEFUSE) <= 1,
+                game2.getDeckObject().getDeckArray(),
+                Card.DEFUSE) <= 1,
                 "There are more than 1 DEFUSEs given 5 players ");
     }
 
@@ -127,11 +127,11 @@ class GameTest {
         game2.insertExplodeCards();
 
         assertEquals(players.size() - 1, Collections.frequency(
-                game.getDeckObject().getDeckAsArrayList(),
-                Card.SpecialCard.EXPLODE));
+                game.getDeckObject().getDeckArray(),
+                Card.EXPLODE));
         assertEquals(players2.size() - 1, Collections.frequency(
-                game2.getDeckObject().getDeckAsArrayList(),
-                Card.SpecialCard.EXPLODE));
+                game2.getDeckObject().getDeckArray(),
+                Card.EXPLODE));
     }
 
 }
