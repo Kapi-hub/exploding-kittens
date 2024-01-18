@@ -7,7 +7,7 @@ import java.util.List;
 public class Player {
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND = 8;
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND_WITHOUT_DEFUSE = 7;
-    private ArrayList<Card> handOfCards;
+    protected ArrayList<Card> handOfCards;
     private String name;
     private int turnsToStay = 0;
 
@@ -27,6 +27,8 @@ public class Player {
     public int getTurnsToStay() {return turnsToStay;}
 
     public boolean hasTurnsToStay()  {return (turnsToStay != 0);}
+
+    public void setTurnsToStay(int turns) {turnsToStay += turns;}
 /* ************************************
                 CONSTRUCTORS
     ************************************ */

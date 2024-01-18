@@ -91,8 +91,8 @@ public class TUI {
         System.out.println("\n[!] Illegal move: " + illegalMove);
     }
 
-    public static void promptFirstMovePlayer(ArrayList<Player> players, int playerIndexToPlayFirstMove) {
-        System.out.println("[!] " + players.get(playerIndexToPlayFirstMove) + " makes the first move.");
+    public static void promptFirstMovePlayer(String currentPlayerName) {
+        System.out.println("[!] " + currentPlayerName + " makes the first move.");
         promptDelimiter();
     }
 
@@ -114,10 +114,6 @@ public class TUI {
         System.out.println("\n[!] The deck has been successfully shuffled.");
     }
 
-    public static void raiseWarningHasTurnsToStay(int turnsToStay) {
-        System.out.println("[!] You cannot play.");
-        System.out.println("[!] You have " + turnsToStay + " turns to stay.");
-    }
 
     public static void promptLastThreeCardsFromDeck(
             Card lastCard,
@@ -127,5 +123,33 @@ public class TUI {
         System.out.println("\n[!] Last card:           " + lastCard);
         System.out.println("[!] Second to last card: " + secondToLastCard);
         System.out.println("[!] Third to last card:  " + thirdToLastCard);
+    }
+
+    public static void raiseWarningHasTurnsToStay(int turnsToStay) {
+        promptLeftTurnsToStay(turnsToStay);
+        System.out.println("[!] A turn is ended when you draw a card or play a SKIP.");
+    }
+
+    public static void promptLeftTurnsToStay(int turnsToStay) {
+        System.out.println("\n[!] You have " + turnsToStay + " left turn(s) to take.");
+    }
+
+    public static void informPlayersCurrentPlayerHasToPlay(String playerNameToPlay,
+                                                           int turnsToPlay) {
+        System.out.println("[!] " + playerNameToPlay + " has " + turnsToPlay
+        + " turns to take.");
+    }
+
+    public static void raiseWarningFavorNoThirdArg() {
+        System.out.println("[!] When playing a FAVOR, you must specify the name of the player.");
+    }
+
+    public static void raiseWarningFavorPlayerNotFound() {
+        System.out.println("[!] Player not found.");
+    }
+
+    public static void informGiveRandomCardUponFavor() {
+        System.out.println("[!] The player whose turn is now played a FAVOR. ");
+        System.out.println("[!] Type \"play <card name that you want to give>.\" ");
     }
 }

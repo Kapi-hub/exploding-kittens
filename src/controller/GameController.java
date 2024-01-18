@@ -4,6 +4,7 @@ import model.*;
 import view.TUI;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class GameController {
@@ -48,28 +49,33 @@ public class GameController {
     public static void initialiseGame() {
         // The player "You" is you, the one reading this.
         for (int index = 0; index < numberOfComputerPlayers; index++) {
-            players.add(new ComputerPlayer("BOT " + index));
+            players.add(new ComputerPlayer("BOT" + index));
         }
         game = new Game(players);
         game.setUp();
-        TUI.promptFirstMovePlayer(game.getPlayers(), game.getCurrentPlayerTurnIndex());
+        game.getPlayers().get(0).setTurnsToStay(3);
+        TUI.promptFirstMovePlayer(game.getCurrentPlayer().getName());
     }
 
     public static void continueGame() {
         gameHasWinner = false;
         move = "";
         while (!gameHasWinner) {
+            currentPlayer = game.getCurrentPlayer();
             TUI.promptDeck(
                     game.getDeckObject().getDeckArray().size());
             TUI.promptDiscardPile(game.getDiscardPile());
             game.getPlayers().forEach(player -> TUI.promptPlayerHand(
                     player.getName(),
                     player.getHand()));
+            if (currentPlayer.hasTurnsToStay())
+                TUI.informPlayersCurrentPlayerHasToPlay(currentPlayer.getName(),
+                        currentPlayer.getTurnsToStay());
             TUI.promptDelimiter();
-            currentPlayer = game.getPlayers().get(game.getCurrentPlayerTurnIndex());
             askAndSendInputForProcessing();
 
-            game.incrementPlayerTurnIndex();
+            if ( !(currentPlayer.hasTurnsToStay()) )
+                game.incrementPlayerTurnIndex();
         }
     }
 
@@ -143,6 +149,19 @@ public class GameController {
 
     public static void raiseWarningHasTurnsToStay(int turnsToStay) {
         TUI.raiseWarningHasTurnsToStay(turnsToStay);
+    }
+
+    public static void promptLeftTurnsToStay(int turnsToStay) {
+        TUI.promptLeftTurnsToStay(turnsToStay);
+    }
+
+    public static void raiseWarningFavorNoThirdArg() {
+        TUI.raiseWarningFavorNoThirdArg();
+        askAndSendInputForProcessing();
+    }
+
+    public static void raiseWarningFavorPlayerNotFound() {
+        TUI.raiseWarningFavorPlayerNotFound();
         askAndSendInputForProcessing();
     }
 
@@ -152,6 +171,23 @@ public class GameController {
             Card thirdToLastCard
     ) {
         TUI.promptLastThreeCardsFromDeck(lastCard, secondToLastCard, thirdToLastCard);
+    }
+
+    public static String getCardFromTargetPlayer(Player targetPlayer) {
+        if (targetPlayer instanceof HumanPlayer) {
+            TUI.informGiveRandomCardUponFavor();
+            move = askForInputAsString();
+        } else {
+            move = ((ComputerPlayer) targetPlayer).getCard(game);
+        }
+        System.out.printf(move);
+
+        if (game.isValid(move, targetPlayer)) {
+            return move;
+        } else {
+            getCardFromTargetPlayer(targetPlayer);
+        }
+        return null;
     }
 
     public static void main(String[] args) {

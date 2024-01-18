@@ -18,4 +18,8 @@ public class ComputerPlayer extends Player {
     public String doMove(Game game) {
         return "draw";
     }
+
+    public String getCard(Game game) {
+        return this.handOfCards.get(0).name();
+    }
 }
