@@ -1,6 +1,7 @@
 package view;
 
 import model.Card;
+import model.Player;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,6 @@ public class TUI {
         promptDelimiter();
         System.out.println("[!] You have decided to play with " + numberOfPlayers
         + " computer player(s).");
-        promptDelimiter();
     }
 
     public static void promptConfirmationOfPlayersWhenComputersPlaying(int numberOfPlayers) {
@@ -54,7 +54,7 @@ public class TUI {
     }
 
     public static void promptDeck(int numberOfCardsInDeck) {
-        System.out.print("Deck pile    : " + numberOfCardsInDeck + " cards remaining\n");
+        System.out.print("\nDeck pile    : " + numberOfCardsInDeck + " cards remaining\n");
     }
 
     public static void promptDiscardPile(ArrayList<Card> discardPile) {
@@ -88,7 +88,44 @@ public class TUI {
     }
 
     public static void raiseWarningWrongInput(String illegalMove) {
-        System.out.println("Illegal move: " + illegalMove);
+        System.out.println("\n[!] Illegal move: " + illegalMove);
     }
 
+    public static void promptFirstMovePlayer(ArrayList<Player> players, int playerIndexToPlayFirstMove) {
+        System.out.println("[!] " + players.get(playerIndexToPlayFirstMove) + " makes the first move.");
+        promptDelimiter();
+    }
+
+    public static void raiseWarningAtExplodePlay() {
+        System.out.println("[!] " + "You cannot play an EXPLODE card. You can only draw one " +
+                "from the deck.");
+    }
+
+    public static void raiseWarningAtDefusePlay() {
+        System.out.println("[!] You cannot play a DEFUSE card.");
+        System.out.println("[!] It is drawn from your hand upon drawing an EXPLODE.");
+    }
+
+    public static void raiseWarningAtDrawIllegalArgs() {
+        System.out.println("[!] Syntax: draw");
+    }
+
+    public static void promptShuffleConfirmation() {
+        System.out.println("\n[!] The deck has been successfully shuffled.");
+    }
+
+    public static void raiseWarningHasTurnsToStay(int turnsToStay) {
+        System.out.println("[!] You cannot play.");
+        System.out.println("[!] You have " + turnsToStay + " turns to stay.");
+    }
+
+    public static void promptLastThreeCardsFromDeck(
+            Card lastCard,
+            Card secondToLastCard,
+            Card thirdToLastCard
+    ) {
+        System.out.println("\n[!] Last card:           " + lastCard);
+        System.out.println("[!] Second to last card: " + secondToLastCard);
+        System.out.println("[!] Third to last card:  " + thirdToLastCard);
+    }
 }

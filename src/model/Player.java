@@ -7,8 +7,10 @@ import java.util.List;
 public class Player {
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND = 8;
     protected static int MAX_NUMBER_OF_CARDS_IN_HAND_WITHOUT_DEFUSE = 7;
-    protected ArrayList<Card> handOfCards;
-    protected String name;
+    private ArrayList<Card> handOfCards;
+    private String name;
+    private int turnsToStay = 0;
+
 
     /* ************************************
               GETTERS & SETTERS
@@ -21,6 +23,10 @@ public class Player {
     public String getName() {
         return name;
     }
+
+    public int getTurnsToStay() {return turnsToStay;}
+
+    public boolean hasTurnsToStay()  {return (turnsToStay != 0);}
 /* ************************************
                 CONSTRUCTORS
     ************************************ */

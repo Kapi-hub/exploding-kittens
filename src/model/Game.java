@@ -1,8 +1,10 @@
 package model;
 
 import controller.GameController;
+import view.TUI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Game {
@@ -10,6 +12,7 @@ public class Game {
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<Card> discardPile;
     private int currentPlayerIndex;
+    private Player currentPlayer;
 
     private final int NUMBER_OF_PLAYERS;
 
@@ -31,6 +34,7 @@ public class Game {
         else {
             currentPlayerIndex = 0;
         }
+        currentPlayer = players.get(currentPlayerIndex);
     }
 
     public ArrayList<Player> getPlayers() {
@@ -53,6 +57,7 @@ public class Game {
         players.forEach(player -> this.players.add(player));
         NUMBER_OF_PLAYERS =  this.players.size();
         currentPlayerIndex = (int) (Math.random() * NUMBER_OF_PLAYERS);
+        currentPlayer  = players.get(currentPlayerIndex);
         deck = new Deck();
         discardPile = new ArrayList<>();
     }
@@ -136,7 +141,12 @@ public class Game {
 
         switch (commands[0].toLowerCase()) {
             case "play" -> processPlay(commands);
-            case "draw" -> processDraw();
+            case "draw" -> {
+                if (commands.length == 1) // "draw" does not accept any arguments
+                    processDraw();
+                else
+                    GameController.raiseWarningAtDrawIllegalArgs();
+            }
             default -> GameController.raiseWarningWrongInput(move);
         }
     }
@@ -144,12 +154,82 @@ public class Game {
     /**
      * @invariant command[0] = "play
      */
-    private void processPlay(String[] commands ) {
+    private void processPlay(String[] commands) {
+        Card firstCard = null;
+
+        if (!(isValid(commands[1]))) {
+            GameController.raiseWarningWrongInput(
+                    commands[1].toUpperCase() + " is not a valid move." +
+                            "\n[!] If it is a valid card, you don't have such a card in your hand.");
+        } else {
+            firstCard = Card.valueOf(commands[1].toUpperCase());
+            switch (firstCard) {
+                case ATTACK  -> processAttackCard();
+                case FAVOR   -> processFavorCard();
+                case NOPE    -> processNopeCard();
+                case SHUFFLE -> processShuffleCard();
+                case SKIP    -> processSkipCard();
+                case FUTURE  -> processFutureCard();
+                case TACOCAT, CATTERMELLON, POTATO, BEARD, RAINBOW
+                             -> processNormalCard(firstCard, commands.length);
+            }
+        }
+    }
+
+    public void processAttackCard() {
 
     }
 
+    public void processFavorCard() {
+
+    }
+
+    public void processNopeCard() {
+
+    }
+
+    public void processShuffleCard() {
+        if (currentPlayer.hasTurnsToStay()) {
+            GameController.raiseWarningHasTurnsToStay(currentPlayer.getTurnsToStay());
+        } else {
+            Collections.shuffle(this.deck.getDeckArray());
+            GameController.promptShuffleConfirmation();
+            currentPlayer.getHand().remove(Card.SHUFFLE);
+            discardPile.add(Card.SHUFFLE);
+        }
+    }
+
+    public void processSkipCard() {
+
+    }
+
+    public void processFutureCard() {
+        if (currentPlayer.hasTurnsToStay()) {
+            GameController.raiseWarningHasTurnsToStay(currentPlayer.getTurnsToStay());
+        } else {
+            GameController.promptLastThreeCardsFromDeck(
+                    deck.getDeckArray().get(deck.getDeckArray().size() - 1),
+                    deck.getDeckArray().get(deck.getDeckArray().size() - 2),
+                    deck.getDeckArray().get(deck.getDeckArray().size() - 3)
+            );
+            currentPlayer.getHand().remove(Card.FUTURE);
+            discardPile.add(Card.FUTURE);
+        }
+    }
+
+    public void processNormalCard(Card card, int doubleOrTripleCombo) {
+
+    }
+
+    public boolean isValid(String cardToCheck) {
+        return ((Arrays.stream(Card.values())
+                .anyMatch(card -> cardToCheck.equalsIgnoreCase(card.name())))
+                && currentPlayer.getHand().contains(Card.valueOf(cardToCheck.toUpperCase()))
+                && !Card.valueOf(cardToCheck.toUpperCase()).equals(Card.DEFUSE)
+                && !Card.valueOf(cardToCheck.toUpperCase()).equals(Card.EXPLODE));
+    }
+
     private void processDraw() {
-        Player currentPlayer = players.get(currentPlayerIndex);
         boolean hasDefuse = currentPlayer.getHand().contains(Card.DEFUSE);
         int desiredIndex;
 
@@ -157,7 +237,7 @@ public class Game {
             desiredIndex = GameController.askIndexOfReinsertingExplode();
             deck.getDeckArray().remove(Card.EXPLODE);
             deck.getDeckArray().add(desiredIndex, Card.EXPLODE);
-            currentPlayer.handOfCards.remove(Card.DEFUSE);
+            currentPlayer.getHand().remove(Card.DEFUSE);
             discardPile.add(Card.DEFUSE);
         } else if (deck.getLastCard() == Card.EXPLODE && !hasDefuse) {
             GameController.informPlayerKick();

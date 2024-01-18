@@ -13,7 +13,8 @@ public enum Card {
     CATTERMELLON,
     POTATO,
     BEARD,
-    RAINBOW
+    RAINBOW;
+
 }
 //    enum SpecialCard implements Card {
 //        EXPLODE,

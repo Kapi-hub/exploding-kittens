@@ -52,6 +52,7 @@ public class GameController {
         }
         game = new Game(players);
         game.setUp();
+        TUI.promptFirstMovePlayer(game.getPlayers(), game.getCurrentPlayerTurnIndex());
     }
 
     public static void continueGame() {
@@ -74,12 +75,11 @@ public class GameController {
 
     public static void askAndSendInputForProcessing() {
         if (currentPlayer instanceof HumanPlayer) {
-            move = askForStringInput();
-            game.processMove(move);
+            move = askForInputAsString();
         } else {
             move = ((ComputerPlayer) currentPlayer).doMove(game);
-            game.processMove(move);
         }
+        game.processMove(move);
     }
 
     public static int askIndexOfReinsertingExplode() {
@@ -109,7 +109,7 @@ public class GameController {
         return Integer.parseInt(userInput.nextLine());
     }
 
-    public static String askForStringInput() {
+    public static String askForInputAsString() {
             TUI.promptInput();
             return userInput.nextLine();
     }
@@ -117,6 +117,41 @@ public class GameController {
     public static void raiseWarningWrongInput(String illegalMove) {
         TUI.raiseWarningWrongInput(illegalMove);
         askAndSendInputForProcessing();
+    }
+
+    public static void raiseWarningAtExplodePlay() {
+        TUI.raiseWarningWrongInput("EXPLODE card.");
+        TUI.raiseWarningAtExplodePlay();
+        askAndSendInputForProcessing();
+    }
+
+    public static void raiseWarningAtDefusePlay() {
+        TUI.raiseWarningWrongInput("DEFUSE card.");
+        TUI.raiseWarningAtDefusePlay();
+        askAndSendInputForProcessing();
+    }
+
+    public static void raiseWarningAtDrawIllegalArgs() {
+        TUI.raiseWarningWrongInput("draw <arguments>.");
+        TUI.raiseWarningAtDrawIllegalArgs();
+        askAndSendInputForProcessing();
+    }
+
+    public static void promptShuffleConfirmation() {
+        TUI.promptShuffleConfirmation();
+    }
+
+    public static void raiseWarningHasTurnsToStay(int turnsToStay) {
+        TUI.raiseWarningHasTurnsToStay(turnsToStay);
+        askAndSendInputForProcessing();
+    }
+
+    public static void promptLastThreeCardsFromDeck(
+            Card lastCard,
+            Card secondToLastCard,
+            Card thirdToLastCard
+    ) {
+        TUI.promptLastThreeCardsFromDeck(lastCard, secondToLastCard, thirdToLastCard);
     }
 
     public static void main(String[] args) {
