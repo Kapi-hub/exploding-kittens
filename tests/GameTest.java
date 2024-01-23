@@ -1,4 +1,5 @@
-import model.*;
+import local.model.Deck;
+import local.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class GameTest {
         assertTrue(game.getCurrentPlayerTurnIndex() >= 0,
                 "Index of player to start is less than 1!");
         assertTrue(game.getCurrentPlayerTurnIndex()
-                <= game.getNUMBER_OF_PLAYERS(),
+                <= game.getInitialNumberOfPlayers(),
                 "Index of player to start is bigger than the number of " +
                         "players.");
     }

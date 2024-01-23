@@ -1,5 +1,6 @@
+import local.model.Deck;
 import org.junit.jupiter.api.*;
-import model.*;
+import local.model.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
