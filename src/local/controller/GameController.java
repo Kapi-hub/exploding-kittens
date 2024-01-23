@@ -159,7 +159,7 @@ public class GameController {
     public static void raiseWarningFavorNoThirdArg() {
         TUI.raiseWarningFavorNoThirdArg();
         askAndSendInputForProcessing();
-    } // testing this branch
+    } // testing this branch after merging
 
     public static void raiseWarningFavorPlayerNotFound() {
         TUI.raiseWarningFavorPlayerNotFound();
