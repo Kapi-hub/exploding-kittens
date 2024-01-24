@@ -172,7 +172,7 @@ public class GameController {
             Card thirdToLastCard
     ) {
         TUI.promptLastThreeCardsFromDeck(lastCard, secondToLastCard, thirdToLastCard);
-    } // .
+    } // Does this work now?
 
     public static String getCardFromTargetPlayer(Player targetPlayer) {
         if (targetPlayer instanceof HumanPlayer) {
