@@ -172,7 +172,7 @@ public class GameController {
             Card thirdToLastCard
     ) {
         TUI.promptLastThreeCardsFromDeck(lastCard, secondToLastCard, thirdToLastCard);
-    }
+    } // .
 
     public static String getCardFromTargetPlayer(Player targetPlayer) {
         if (targetPlayer instanceof HumanPlayer) {
