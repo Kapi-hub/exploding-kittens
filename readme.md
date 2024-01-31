@@ -9,7 +9,7 @@ developed the game without the network pattern. The <b>local</b> varies a lot, a
 stage (I moved onto the network folder before finishing the TUI & Game logic).
 
 Nevertheless, for the final submission, everything will be done in the <b>network</b> folder. 
-
+ 
 Thus, if you want to start the project, you will start only the Server and Client. Nothing less, nothing more.
 
 **Mention**: There cannot be 2 BOTs playing against eachother. Only Humans vs Humans or Humans vs BOTs. Nevertheless,
