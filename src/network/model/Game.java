@@ -3,7 +3,6 @@ package network.model;
 import network.controller.GameController;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Game {
     private Deck deck;
@@ -13,8 +12,8 @@ public class Game {
     private Player currentPlayer;
     private GameController controller;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private boolean winner = false;
-    private boolean waitingForPlayerInput = false;
 
     private final int INITIAL_NUMBER_OF_PLAYERS;
     private int currentNumberOfPlayers;
@@ -34,14 +33,6 @@ public class Game {
         return players;
     }
 
-    public int getCurrentNumberOfPlayers() {
-        return currentNumberOfPlayers;
-    }
-
-    public int getInitialNumberOfPlayers() {
-        return INITIAL_NUMBER_OF_PLAYERS;
-    }
-
     public ArrayList<Card> getDiscardPile() {
         return discardPile;
     }
@@ -54,10 +45,6 @@ public class Game {
         return this.winner;
     }
 
-    public void setWinner(boolean winner) {
-        this.winner = winner;
-    }
-
     /* ************************************
                 CONSTRUCTORS
     ************************************ */
@@ -66,7 +53,7 @@ public class Game {
      * @param players ArrayList of players of the game
      * @requires players != null;
      */
-    public Game(ArrayList<Player> players, GameController controller) {
+    public Game(final ArrayList<Player> players, final GameController controller) {
         players.forEach(player -> this.players.add(player));
         INITIAL_NUMBER_OF_PLAYERS = this.players.size();
         currentNumberOfPlayers = this.players.size();
@@ -81,20 +68,20 @@ public class Game {
                     METHODS
     ************************************ */
 
-    /* ****** SET UP OF THE GAME ******* */
-
     /**
      * Sets up the method exactly as the rules indicate.
-     * First method combines STEP 1 & 2 from the rules, removing the Exploding Kittens (4)
-     * and Defuses (6) cards.
-     * Second method deals the right number of cards to players. That is, each player gets
-     * a Defuse card. Then, depending on NUMBER_OF_PLAYERS, there are inserted 1 or 2
-     * Defuse cards back in the deck. Then, each player gets 7 cards from the deck, for
-     * a total of 8.
-     * Third method inserts NUMBER_OF_PLAYERS - 1 (such that there remains a winner) Exploding
-     * cards back into the deck. The deck is then shuffled and ready to be played.
+     * First method combines STEP 1 & 2 from the rules, removing
+     * the Exploding Kittens (4) and Defuses (6) cards.
+     * Second method deals the right number of cards to players.
+     * That is, each player gets a Defuse card. Then, depending on
+     * NUMBER_OF_PLAYERS, there are inserted 1 or 2. Defuse cards back
+     * in the deck. Then, each player gets 7 cards from the deck, for
+     * a total of 8. Third method inserts NUMBER_OF_PLAYERS - 1
+     * (such that there remains a winner) Exploding cards back into the deck.
+     * The deck is then shuffled and ready to be played.
      *
-     * @ensures Player's hands (player.getHand()) have 8 cards (7 random + 1 DEFUSE)
+     * @ensures Player's hands (player.getHand()) have 8 cards
+     * (7 random + 1 DEFUSE)
      * @ensures Deck has EXPLODING cards = (numberOfPlayers - 1)
      */
     public void init() {
@@ -115,14 +102,15 @@ public class Game {
     }
 
     /**
-     * Deals the right number of cards to players. That is, each player gets
-     * a Defuse card. Then, depending on NUMBER_OF_PLAYERS, there are inserted 1 or 2
-     * Defuse cards back in the deck. Then, each player gets 7 cards from the deck, for
-     * a total of 8.
+     * Deals the right number of cards to players. That is,
+     * each player gets a Defuse card. Then, depending on NUMBER_OF_PLAYERS,
+     * there are inserted 1 or 2 Defuse cards back in the deck.
+     * Then, each player gets 7 cards from the deck, for a total of 8.
      *
      * @ensures Each player has 8 cards && (1 or 2) Defuse cards in deck.
      */
     public void dealCardsToPlayers() {
+        //noinspection DuplicatedCode - Because duplicated code is in local
         players.forEach(player -> player.getHand().add(Card.DEFUSE));
 
         this.deck.getDeckArray().add(Card.DEFUSE);
@@ -140,30 +128,39 @@ public class Game {
     /**
      * Inserts INITIAL_NUMBER_OF_PLAYERS - 1 (such that there remains a winner) Exploding
      * cards back into the deck. The deck is then shuffled and ready to be played.
+     *
+     * @ensures Deck shuffled & ready to play
      */
     public void insertExplodeCards() {
         for (int cardIndex = 0; cardIndex < INITIAL_NUMBER_OF_PLAYERS - 1; cardIndex++) {
             deck.getDeckArray().add(Card.EXPLODE);
         }
         Collections.shuffle(deck.getDeckArray());
-        deck.getDeckArray().add(Card.EXPLODE);
+//        deck.getDeckArray().add(Card.EXPLODE);
     }
 
-    /* ********* COMMAND PROCESSING ********* */
+    /* ************************************
+              COMMAND PROCESSING
+    ************************************ */
 
-    // Receives just cards, not the command
-    // Receives "favor alex", not "PLAYMOVE favor alex"
+    /**
+     * Main method of the logic of the game, where each move that is received
+     * from a client is gathered here. There are several checks implied, each
+     * of them checking if the move is of a specific type (normal move /
+     * 3 of a kind / 2 of a kind) or if the move adheres to some rules
+     * (no longer than 5 args, 2 of a kind with different cards in composition
+     * and so on).
+     *
+     * @param cmd != null
+     */
     public void processPlay(String[] cmd) {
-        String fullCmd = cmd[0];
-        String[] splittedCmdInter = fullCmd.split("\\s+"); // On SPACE
-        String[] splittedCmd = Arrays.copyOfRange(splittedCmdInter, 1,
-                splittedCmdInter.length);
-        splittedCmd = Arrays.stream(splittedCmd).map(String::toUpperCase)
-                .toArray(String[]::new);
+        Card firstCard;
+        String[] splittedCmdInter = cmd[0].split("\\s+");
+        String[] splittedCmd = this.getPlayersMoveSplitted(cmd);
 
-        Card firstCard = null;
-        if (splittedCmdInter[0].equalsIgnoreCase("DRAW")) {processDraw();}
-        else if (splittedCmd[0].equals(Card.DEFUSE.name())
+        if (splittedCmdInter[0].equalsIgnoreCase("DRAW")) {
+            processDraw();
+        } else if (splittedCmd[0].equals(Card.DEFUSE.name())
                 || splittedCmd[0].equals(Card.EXPLODE.name())
                 || splittedCmd[0].equals(Card.NOPE.name())) {
             controller.sendPrivateMsg("You cannot play a DEFUSE or EXPLODE." +
@@ -212,7 +209,6 @@ public class Game {
     // Receives "favor alex", not "PLAYMOVE favor alex"
 //    no NOPE case
     private boolean isRegularMoveValid(String[] cmd) {
-//        controller.doBroadcast(cmd.length + "");
         if (cmd.length == 0) {
             controller.sendPrivateMsg("No cards provided",
                     currentPlayerIndex);
@@ -220,14 +216,14 @@ public class Game {
         }
 
         if (cmd.length > 5) {
-            controller.sendPrivateMsg("No move has that " +
-                    "many arguments", currentPlayerIndex);
+            controller.sendPrivateMsg("No move has that "
+                    + "many arguments", currentPlayerIndex);
             return false;
         }
 
         if (cmd.length == 2 && cmd[0].equals(cmd[1])) {
-            controller.sendPrivateMsg("2 of a Kind format: " +
-                    "<CARD> <CARD> <TARGET PLAYER'S NAME>", currentPlayerIndex);
+            controller.sendPrivateMsg("2 of a Kind format: "
+                    + "<CARD> <CARD> <TARGET PLAYER'S NAME>", currentPlayerIndex);
         }
 
         Card firstCard;
@@ -235,24 +231,23 @@ public class Game {
         try {
             firstCard = Card.valueOf(cmd[0].toUpperCase());
         } catch (IllegalArgumentException e) {
-            controller.sendPrivateMsg("First provided card is not" +
-                    " actually a card.", currentPlayerIndex);
+            controller.sendPrivateMsg("First provided card is not"
+                    + " actually a card.", currentPlayerIndex);
             return false;
         }
-            switch (firstCard) {
-                case FAVOR: return isFavorMoveValid(cmd);
-                case ATTACK, SHUFFLE, SKIP, FUTURE:
-                    return isGenericMoveValid(cmds, firstCard);
-        }
-        return true;
+        return switch (firstCard) {
+            case FAVOR -> isFavorMoveValid(cmd);
+            case ATTACK, SHUFFLE, SKIP, FUTURE -> isGenericMoveValid(cmds, firstCard);
+            default -> true;
+        };
     }
 
     // EXPECTED CORRECT FORMAT:
     // <ATTACK / SHUFFLE / SKIP / FUTURE>
-    private boolean isGenericMoveValid(String[] cmd, Card expectedCard) {
+    private boolean isGenericMoveValid(String[] cmd, final Card expectedCard) {
         if (cmd.length != 1) {
             controller.sendPrivateMsg("Format: play " +
-                            expectedCard.name(), currentPlayerIndex);
+                    expectedCard.name(), currentPlayerIndex);
             return false;
         }
         return true;
@@ -262,19 +257,19 @@ public class Game {
     // <"FAVOR"> <TARGET PLAYER'S NAME>
     private boolean isFavorMoveValid(String[] cmd) {
         if (cmd.length != 2) {
-            controller.sendPrivateMsg("Format: " +
-                    "play <FAVOR> <Target Player's Name>", currentPlayerIndex);
+            controller.sendPrivateMsg("Format: "
+                    + "play <FAVOR> <Target Player's Name>", currentPlayerIndex);
             return false;
         } else if (!doesPlayerHaveCardInHand(Card.FAVOR)) {
-                return false;
+            return false;
         } else return isTargetPlayerValid(getPlayerFromString(cmd[1]));
     }
 
     // EXPECTED CORRECT FORMAT:
     // <CARD> <CARD> <CARD> <TARGET PLAYER'S NAME> <DESIRED CARD>
     private boolean checkThreeOfAKind(String[] cmd) {
-        if ( !(cmd[0].equalsIgnoreCase(cmd[1]) &&
-                cmd[1].equalsIgnoreCase(cmd[2])) ) {
+        if (!(cmd[0].equalsIgnoreCase(cmd[1])
+                && cmd[1].equalsIgnoreCase(cmd[2]))) {
             return false;
         } else {
             if (cmd.length == 5) {
@@ -302,13 +297,14 @@ public class Game {
                 if (counter == 3) {
 
                     // Check if all cards are same.
-                    if (cmd[0].equalsIgnoreCase(cmd[1]) &&
-                            cmd[1].equalsIgnoreCase(cmd[2])) {
+                    if (cmd[0].equalsIgnoreCase(cmd[1])
+                            && cmd[1].equalsIgnoreCase(cmd[2])) {
 
                         // Check if target player is valid (return true if yes)
                         return isTargetPlayerValid(getPlayerFromString(cmd[3]));
                     } else {
-                        controller.sendPrivateMsg("Not identical cards or invalid player",
+                        controller.sendPrivateMsg("Not identical "
+                                        + "cards or invalid player",
                                 currentPlayerIndex);
                     }
                 } else {
@@ -373,26 +369,26 @@ public class Game {
             targetPlayer.handOfCards.remove(Card.valueOf(cmd[4]));
 
             controller.sendPrivateMsg("You got " + targetPlayer.getName()
-            + "'s " + cmd[4].toUpperCase() + ".", currentPlayerIndex);
+                    + "'s " + cmd[4].toUpperCase() + ".", currentPlayerIndex);
             controller.sendPrivateMsg(currentPlayer.getName() +
-                    " played a 3 OF A KIND on your " + cmd[4].toUpperCase(),
+                            " played a 3 OF A KIND on your " + cmd[4].toUpperCase(),
                     players.indexOf(targetPlayer));
 
         } else {
-          controller.sendPrivateMsg(targetPlayer.getName() +
-                  " did not have the desired card", currentPlayerIndex);
-          controller.sendPrivateMsg("Your cards are put " +
-                  "in the discard pile.", currentPlayerIndex);
+            controller.sendPrivateMsg(targetPlayer.getName() +
+                    " did not have the desired card", currentPlayerIndex);
+            controller.sendPrivateMsg("Your cards are put " +
+                    "in the discard pile.", currentPlayerIndex);
         }
-            removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
-            removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
-            removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
+        removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
+        removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
+        removeFromHandAndAddToDiscardPile(Card.valueOf(cmd[0]));
     }
 
     private void processTwoOfAKind(String[] cmd) {
         if (cmd.length != 3) {
-            controller.sendPrivateMsg("2 of a Kind format: " +
-                    "<CARD> <CARD> <TARGET PLAYER'S NAME>", currentPlayerIndex);
+            controller.sendPrivateMsg("2 of a Kind format: "
+                    + "<CARD> <CARD> <TARGET PLAYER'S NAME>", currentPlayerIndex);
         } else {
             Player targetPlayer = this.getPlayerFromString(cmd[2]);
             Card randomlyChosenCard = targetPlayer
@@ -413,7 +409,7 @@ public class Game {
             controller.sendPrivateMsg("You got a " + randomlyChosenCard + ".",
                     currentPlayerIndex);
             controller.sendPrivateMsg("Your 2 identical cards have been" +
-                    " put in the discard pile.",currentPlayerIndex);
+                    " put in the discard pile.", currentPlayerIndex);
             controller.sendPrivateMsg(currentPlayer.getName() + " got from you a " +
                     randomlyChosenCard.name() + ".", players.indexOf(targetPlayer));
         }
@@ -422,7 +418,7 @@ public class Game {
     private boolean doesPlayerHaveCardInHand(Card card) {
         if (!currentPlayer.handOfCards.contains(card)) {
             controller.sendPrivateMsg("You don't have " +
-                    card.name() + " card in your hand." , currentPlayerIndex);
+                    card.name() + " card in your hand.", currentPlayerIndex);
             return false;
         }
         return true;
@@ -441,8 +437,8 @@ public class Game {
             players.get(nextPlayerIndex).setTurnsToPlay(+1);
         } else {
             players.get(nextPlayerIndex)
-                    .setTurnsToPlay(+ currentPlayer.getTurnsToPlay());
-            currentPlayer.setTurnsToPlay(- currentPlayer.getTurnsToPlay());
+                    .setTurnsToPlay(+currentPlayer.getTurnsToPlay());
+            currentPlayer.setTurnsToPlay(-currentPlayer.getTurnsToPlay());
             controller.sendPrivateMsg("You passed the turns to the next player.",
                     currentPlayerIndex);
         }
@@ -453,15 +449,15 @@ public class Game {
     }
 
     public void processFavorCard(String targetPlayerName) {
-            Player targetPlayer = players.stream()
-                    .filter(player -> player.getName().equalsIgnoreCase(targetPlayerName))
-                    .findFirst()
-                    .orElse(null); // Must. This is how Streams work in JAVA. It is actually checked from source method
+        Player targetPlayer = players.stream()
+                .filter(player -> player.getName().equalsIgnoreCase(targetPlayerName))
+                .findFirst()
+                .orElse(null); // Must. This is how Streams work in JAVA. It is actually checked from source method
 
-            controller.requestCardFromPlayer(
-                    players.indexOf(targetPlayer),
-                    currentPlayer.getName()
-            );
+        controller.requestCardFromPlayer(
+                players.indexOf(targetPlayer),
+                currentPlayer.getName()
+        );
     }
 
     public void processNopeCard() {
@@ -485,8 +481,8 @@ public class Game {
         if (currentPlayer.hasTurnsToPlay()) {
             currentPlayer.setTurnsToPlay(-1);
         }
-            currentPlayer.getHand().remove(Card.SKIP);
-            discardPile.add(Card.SKIP);
+        currentPlayer.getHand().remove(Card.SKIP);
+        discardPile.add(Card.SKIP);
     }
 
     public void processFutureCard() {
@@ -500,33 +496,6 @@ public class Game {
         );
     }
 
-    /**
-     * is valid card of target player
-     * @param cardToCheck
-     * @param targetPlayer
-     * @return
-     */
-    public boolean isRegularMoveValid(String cardToCheck, Player targetPlayer) {
-
-        boolean isCard = (Arrays.stream(Card.values())
-                .anyMatch(card -> cardToCheck.equalsIgnoreCase(card.name())));
-        if (isCard) {
-            boolean isCardInPlayerHand = targetPlayer.getHand().contains(Card.valueOf(cardToCheck.toUpperCase()));
-            boolean isCardDefuse = Card.valueOf(cardToCheck.toUpperCase()).equals(Card.DEFUSE);
-            boolean isCardExplode = Card.valueOf(cardToCheck.toUpperCase()).equals(Card.EXPLODE);
-
-            // If targetPlayer isn't currentPlayer, then targetPlayer can give Defuse
-            if ( !(targetPlayer.equals(currentPlayer)) ) {
-                return (isCardInPlayerHand && !isCardExplode);
-            } else {
-                // Player cannot play; Automatically taken from his hand
-                return (isCardInPlayerHand && !isCardExplode && !isCardDefuse);
-            }
-        }
-        return false;
-    }
-
-
     private void processDraw() {
         boolean currentPlayerHasDefuse = currentPlayer.getHand().contains(Card.DEFUSE);
 
@@ -534,18 +503,14 @@ public class Game {
             controller.askIndexOfReinsertingExplode();
             deck.getDeckArray().remove(Card.EXPLODE);
             this.removeFromHandAndAddToDiscardPile(Card.DEFUSE);
-        }
-        else if (deck.getLastCard() == Card.EXPLODE && !currentPlayerHasDefuse) {
+        } else if (deck.getLastCard() == Card.EXPLODE && !currentPlayerHasDefuse) {
             controller.announceKick(currentPlayerIndex);
             controller.doBroadcast(currentPlayer.getName() + " drew an EXPLODE, " +
                     "but did not have a DEFUSE. He/She is out.");
             this.removePlayerFromGame(currentPlayerIndex);
             checkHasWinner();
-        }
-        else if (deck.getLastCard() != Card.EXPLODE) {
+        } else if (deck.getLastCard() != Card.EXPLODE) {
             currentPlayer.getHand().add(deck.getLastCardAndRemove());
-//            controller.sendPrivateMsg("You drew a card from the deck.",
-//                    currentPlayerIndex);
             currentPlayer.setTurnsToPlay(-1);
         }
         if (currentPlayer.hasTurnsToPlay()) {
@@ -557,7 +522,7 @@ public class Game {
 
     /* ********* CARD PROCESSING ********* */
 
-    public void doInsertExplode (int cardIndex, int playerIndex) {
+    public void doInsertExplode(int cardIndex, int playerIndex) {
         this.deck.getDeckArray().add(cardIndex, Card.EXPLODE);
         controller.sendPrivateMsg("EXPLODE inserted successfully at " + cardIndex,
                 playerIndex);
@@ -575,7 +540,7 @@ public class Game {
     }
 
     public void checkHasWinner() {
-        if (currentNumberOfPlayers == 1 ) {
+        if (currentNumberOfPlayers == 1) {
 //            incrementPlayerTurnIndex();
             controller.doBroadcast("YOU WON! CONGRATULATIONS!");
             System.exit(0);
@@ -597,7 +562,6 @@ public class Game {
         this.deck.getDeckArray().remove(Card.EXPLODE);
     }
 
-
     public void removeFromHandAndAddToDiscardPile(Card card) {
         currentPlayer.getHand().remove(card);
         discardPile.add(card);
@@ -617,27 +581,19 @@ public class Game {
         this.removeFromHandAndAddToDiscardPile(Card.FAVOR);
     }
 
-    public boolean isWaitingForPlayerInput() {
-        return waitingForPlayerInput;
-    }
-
-    public void setWaitingForPlayerInput(boolean waitingForPlayerInput) {
-        this.waitingForPlayerInput = waitingForPlayerInput;
-    }
-
-    public boolean isClientsTurn (int playerIndexWhoPlayedMove) {
+    public boolean isClientsTurn(int playerIndexWhoPlayedMove) {
         return (playerIndexWhoPlayedMove == currentPlayerIndex);
     }
 
     public boolean isTargetPlayerValid(Player targetPlayer) {
         if (targetPlayer == null) {
             controller.sendPrivateMsg("There is no such player."
-                    ,currentPlayerIndex);
+                    , currentPlayerIndex);
             return false;
         } else if (currentPlayer.getName().
                 equalsIgnoreCase(targetPlayer.getName())) {
             controller.sendPrivateMsg("You cannot play it to yourself."
-                    ,currentPlayerIndex);
+                    , currentPlayerIndex);
             return false;
         }
         return true;
@@ -651,14 +607,9 @@ public class Game {
     }
 
     public void removeCardFromPlayerHand(String[] clientMsgSplitted) {
-        String fullCmd = clientMsgSplitted[0];
-        String[] splittedCmdInter = fullCmd.split("\\s+"); // On SPACE
-        String[] splittedCmd = Arrays.copyOfRange(splittedCmdInter, 1,
-                splittedCmdInter.length);
-        splittedCmd = Arrays.stream(splittedCmd).map(String::toUpperCase)
-                .toArray(String[]::new);
+        Card firstCard;
+        String[] splittedCmd = this.getPlayersMoveSplitted(clientMsgSplitted);
 
-        Card firstCard = null;
         if (splittedCmd[0].equals(Card.DEFUSE.name())
                 || splittedCmd[0].equals(Card.EXPLODE.name())
                 || splittedCmd[0].equals(Card.NOPE.name())) {
@@ -685,23 +636,29 @@ public class Game {
 
         // ATTACK / FAVOR / SEE THE FUTURE / SKIP / SHUFFLE
         if (splittedCmd.length == 1 || splittedCmd.length == 2) {
-                firstCard = Card.valueOf(splittedCmd[0].toUpperCase());
-                switch (firstCard) {
-                    case ATTACK -> this.removeFromHandAndAddToDiscardPile(Card.ATTACK);
-                    case FAVOR -> this.removeFromHandAndAddToDiscardPile(Card.FAVOR); // target player's name
-                    case NOPE -> this.removeFromHandAndAddToDiscardPile(Card.NOPE);
-                    case SHUFFLE -> this.removeFromHandAndAddToDiscardPile(Card.SHUFFLE);
-                    case SKIP -> this.removeFromHandAndAddToDiscardPile(Card.SKIP);
-                    case FUTURE -> this.removeFromHandAndAddToDiscardPile(Card.FUTURE);
-                    case TACOCAT, CATTERMELLON, POTATO, BEARD, RAINBOW
-                            -> {
-                        this.removeFromHandAndAddToDiscardPile(Card.valueOf(splittedCmd[0]));
-                        this.removeFromHandAndAddToDiscardPile(Card.valueOf(splittedCmd[0]));
-                    }
+            firstCard = Card.valueOf(splittedCmd[0].toUpperCase());
+            switch (firstCard) {
+                case ATTACK -> this.removeFromHandAndAddToDiscardPile(Card.ATTACK);
+                case FAVOR -> this.removeFromHandAndAddToDiscardPile(Card.FAVOR); // target player's name
+                case NOPE -> this.removeFromHandAndAddToDiscardPile(Card.NOPE);
+                case SHUFFLE -> this.removeFromHandAndAddToDiscardPile(Card.SHUFFLE);
+                case SKIP -> this.removeFromHandAndAddToDiscardPile(Card.SKIP);
+                case FUTURE -> this.removeFromHandAndAddToDiscardPile(Card.FUTURE);
+                case TACOCAT, CATTERMELLON, POTATO, BEARD, RAINBOW -> {
+                    this.removeFromHandAndAddToDiscardPile(Card.valueOf(splittedCmd[0]));
+                    this.removeFromHandAndAddToDiscardPile(Card.valueOf(splittedCmd[0]));
+                }
             }
         }
     }
 
-//    public boolean isTargetPlayerValid(int targetPlayerIndex) {
-//    }
+    public String[] getPlayersMoveSplitted(String[] cmd) {
+        String fullCmd = cmd[0];
+        String[] splittedCmdInter = fullCmd.split("\\s+"); // On SPACE
+        String[] splittedCmd = Arrays.copyOfRange(splittedCmdInter, 1,
+                splittedCmdInter.length);
+        splittedCmd = Arrays.stream(splittedCmd).map(String::toUpperCase)
+                .toArray(String[]::new);
+        return splittedCmd;
+    }
 }

@@ -29,6 +29,7 @@ public class ClientTUI {
     public Boolean getHasWrittenToTerminal() {
         return hasWrittenToTerminal;
     }
+
     /* ************************************
                     GENERAL
     ************************************ */

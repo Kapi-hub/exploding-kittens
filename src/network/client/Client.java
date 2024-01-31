@@ -4,9 +4,7 @@ import network.Protocol.Protocol;
 import network.exceptions.ExitProgram;
 import network.exceptions.InvalidClientMove;
 import network.exceptions.ServerUnavailableException;
-import network.model.Card;
 import network.model.ComputerPlayer;
-import network.model.Game;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -18,40 +16,86 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
 
-public class Client implements Runnable{
+public class Client implements Runnable {
+    /** Socket of the client. It is used for the Server - Client connection */
     private Socket sock;
+
+    /** The address of the server. */
     private InetAddress addr;
+
+    /** The port of the server. */
     private int port;
+
+    /** object through each client receives messages from Server. */
     private BufferedReader in;
+
+    /** object through each client sends messages from Server. */
     private BufferedWriter out;
-    private Game game;
+
+    /** Handles the communication between the Controller (this)
+     * and the view (ClientTUI).
+     */
     private ClientTUI clientTUI;
+
+    /** The name of this instance of the Client. */
     private String name;
+
+    /** Flag used for hook which checks if client disconnected
+     * by closing the terminal (pressing on the red button in IntelliJ).
+     */
     private boolean isShuttingDownByForce = false;
+
+    /** Flag used for hook which checks deliberately typed in
+     * "abort" in chat.
+     */
     private boolean isShuttingDownByWill = false;
 
+    /** Used for checking if the current instance is a computer player
+     * or a human one.
+     */
     private boolean isComputerPlayer;
+
+    /** Each client has an instance of a computer player, despite it
+     * being used only when this instance is actually a computer player.*/
     private ComputerPlayer computerPlayer;
 
+    /** Used for notifying (and waiting) on the socket that is listening
+ * for messages from the server. */
     private final Object lock = new Object();
 
+    /** `Usage of how the Client should be started. That is, what form should
+     * the arguments passed in the run configuration take.
+     */
     private static final String USAGE
             = "usage: <name> <address> <port> <true/false>";
 
     /* ************************************
            FEATURES & GAMES SUPPORTED
+                   BY CLIENT
     ************************************ */
 
-    private final static String FEATURE_CHAT = "C";
-    private final static String FEATURE_COMBOS = "S";
-    private final static String FEATURE_LOBBY = "L";
-    private final static String NORMAL_GAME = "N";
+    /** Shows that (my) client supports the chat functionality. */
+    private static final String FEATURE_CHAT = "C";
+    /** Shows that (my) client supports the COMBOS bonus. */
+    private static final String FEATURE_COMBOS = "S";
+    /** Shows that (my) client supports the lobby functionality. */
+    private static final String FEATURE_LOBBY = "L";
+    /** Shows that (my) client supports the normal-game functionality. */
+    private static final String NORMAL_GAME = "N";
 
     /* ************************************
                 CONSTRUCTORS
     ************************************ */
 
-    public Client(String[] args) {
+    /**
+     *  Constructs a client with the parameters that were passed
+     *  in the run configuration of the file.
+     * @param args run configuration parameters
+     * @requires addr != null
+     * @requires port = 0;
+     * @requires sock = null;
+     */
+    public Client(final String[] args) {
         clientTUI = new ClientTUI(this);
 
         if (args.length != 4) {
@@ -105,11 +149,7 @@ public class Client implements Runnable{
             computerPlayer = new ComputerPlayer(args);
 
         // tries to create a connection
-        try {
-            this.createConnection();
-        } catch (ExitProgram e) {
-            throw new RuntimeException(e);
-        }
+        this.createConnection();
     }
 
     /* ************************************
@@ -120,15 +160,14 @@ public class Client implements Runnable{
         return this.lock;
     }
 
-    public ClientTUI getClientTUI() {
-        return clientTUI;
-    }
-
     /* ************************************
                     NETWORK
     ************************************ */
 
-    public void createConnection() throws ExitProgram {
+    /**
+     * Creates a connection to the target given the ip and port.
+     */
+    public void createConnection() {
         clearConnection();
         try {
             clientTUI.printMessage("Attempting to connect to " + addr + ":"
@@ -198,17 +237,15 @@ public class Client implements Runnable{
             out.close();
             sock.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            clientTUI.printMessage("Could not shutdown the client.");
         }
     }
 
     /**
      * Handles commands received from the server by calling the according
      * methods.
-     *
      * If the received input is invalid, send an "Unknown Command"
      * message to the server.
-     *
      * @param msg command from client
      * @throws IOException if an IO errors occur.
      */
@@ -224,9 +261,9 @@ public class Client implements Runnable{
                 clientTUI.printMessage("Type >> ");
                 break;
             case Protocol.SEETHEFUTURE:
-                clientTUI.printMessageFromServer(splittedMessage[1] + " | " +
-                        splittedMessage[2] + " | " +
-                        splittedMessage[3]);
+                clientTUI.printMessageFromServer(splittedMessage[1]
+                        + " | " + splittedMessage[2]
+                        + " | " + splittedMessage[3]);
                 break;
             case Protocol.BROADCAST, Protocol.PRIVATE:
                 message = this.getStringFromSplittedMessage(splittedMessage);
@@ -266,8 +303,7 @@ public class Client implements Runnable{
                             TimerTask timerTask = new TimerTask() {
                                 @Override
                                 public void run() {
-                                        getMoveFromComputerPlayer(Arrays.copyOfRange(splittedMessage,
-                                                1, splittedMessage.length));
+                                        getMoveFromComputerPlayer();
                                     if (computerPlayer.isMustInsertBack()) {
                                         getIndexFromComputerPlayer();
                                     }
@@ -343,7 +379,7 @@ public class Client implements Runnable{
         this.doInsert(computerPlayer.getIndexToReinsertExplode());
     }
 
-    public void getMoveFromComputerPlayer(String[] splittedMessage) {
+    public void getMoveFromComputerPlayer() {
         try {
             this.doPlay(computerPlayer.doMove());
         } catch (ExitProgram | ServerUnavailableException | InvalidClientMove e) {
@@ -362,14 +398,11 @@ public class Client implements Runnable{
     /* ************************************
                     METHODS
     ************************************ */
-
     public void init() {
 
         try {
             this.handleHello();
-        } catch (ServerUnavailableException e) {
-            throw new RuntimeException(e);
-        } catch (ProtocolException e) {
+        } catch (ServerUnavailableException | ProtocolException e) {
             throw new RuntimeException(e);
         }
 
@@ -401,43 +434,43 @@ public class Client implements Runnable{
         }
     }
 
-    public String[] getSpilt(String serverReply) {
+    /** Retrieves the given argument as a splitted, String[] object.
+     * The method is needed because the team's desired DELIMITER,
+     * {@link Protocol#DELIMITER}, is used internally by JVM for splitting
+     * the string. Thus, the Pattern class must be used.
+     * @param serverReply must be a string
+     * @requires serverReply != null
+     * @ensures Array of Strings.
+     */
+    public String[] getSpilt(final String serverReply) {
         return serverReply.split(Pattern.quote(Protocol.DELIMITER));
     }
 
-    public void sendFavorCard(String favorCard, String targetPlayerName) {
-        try {
-            // split[1] = "FAVOR"; split[2] targetName
-            this.doPlay(favorCard.toUpperCase(), targetPlayerName);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            clientTUI.printMessage("No name specified. Try again.");
-            clientTUI.printMessage("Type >> ");
-        }
-    }
-
-    public boolean isCatCard(String supposedCatCard) {
-        return (supposedCatCard.equalsIgnoreCase(Card.CATTERMELLON.name()) ||
-                supposedCatCard.equalsIgnoreCase(Card.BEARD.name()) ||
-                supposedCatCard.equalsIgnoreCase(Card.RAINBOW.name()) ||
-                supposedCatCard.equalsIgnoreCase(Card.POTATO.name()) ||
-                supposedCatCard.equalsIgnoreCase(Card.TACOCAT.name()));
-    }
-
-    public void onTerminalShutdown() throws RuntimeException {
+    /** Called whenever the client closes the terminal from the red button,
+     * in IntelliJ. There is initialised in the {@link #main(String[] args)}
+     * a hooker which listens for that. Whenever the hooker is triggered, this
+     * is called.
+     */
+    public void onTerminalShutdown()  {
         clientTUI.printMessage("JVM shutdown triggered!");
         isShuttingDownByForce = true;
         if (!isShuttingDownByWill) {
-            try {
-                this.doAbort();
-            } catch (ServerUnavailableException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            this.doAbort();
         }
     }
+
     /* ************************************
                       DO's
     ************************************ */
 
+    /** Sends a {@link Protocol#PLAYMOVE} command to the server, with as many
+     * arguments as the client types in.
+     * <p> It can receive as low as one argument: play SHUFFLE</p>
+     *  <p> It can receive as many as 6 arguments:
+     *      play SHUFFLE SHUFFLE SHUFFLE 'TARGET PLAYER NAME' 'DESIRED CARD' </p>
+     * @param cmd != null
+     * @throws RuntimeException if the server is unreachable.
+     */
     public void doPlay(String... cmd ) {
         StringBuilder socketMsg = new StringBuilder().append(Protocol.PLAYMOVE);
 
@@ -452,6 +485,12 @@ public class Client implements Runnable{
         }
     }
 
+    /** Sends an INSERT command to the server. This method is called
+     * whenever the client needs to specify an index where the
+     * {@link Protocol.cardType#EXPLODE} card should go in the deck pile.
+     * @requires index > 0 && index < deckPileSize && index != null
+     * @throws RuntimeException if the server is unreachable.
+     */
     public void doInsert(String index) {
         try {
             this.sendMessage(Protocol.INSERTEXPLODE + Protocol.DELIMITER +
@@ -461,6 +500,10 @@ public class Client implements Runnable{
         }
     }
 
+    /** Sends a DRAW command to the server. This method is called
+     * whenever the client types in "draw".
+     * @throws RuntimeException if the server is unreachable.
+     */
     public void doDraw() {
         try {
             this.sendMessage(Protocol.PLAYMOVE + Protocol.DELIMITER +
@@ -470,6 +513,11 @@ public class Client implements Runnable{
         }
     }
 
+    /** Sends a message to server that is to be kept at Server level.
+     * That is, it doesn't need to be redirected to everyone.
+     * @requires message != null
+     * @throws RuntimeException if the server is not reachable
+     * */
     public void doPrivateMessage(String message) {
         try {
             this.sendMessage(Protocol.PRIVATE + Protocol.DELIMITER +
@@ -479,29 +527,44 @@ public class Client implements Runnable{
         }
     }
 
-    public void doBroadcast(String message) {
+    /** Sends a message to server that needs to be
+     * redirected to everyone.
+     * @requires message != null
+     * @throws RuntimeException if the server is not reachable
+     * */
+    public void doBroadcast(final String message) {
         try {
-            this.sendMessage(Protocol.BROADCAST + Protocol.DELIMITER +
-                    message);
+            this.sendMessage(Protocol.BROADCAST
+                    + Protocol.DELIMITER + message);
         } catch (ServerUnavailableException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void doAbort() throws ServerUnavailableException {
+    /** If the client typed in "abort", then this method is called.
+     * The method sends an "ABORT" command to the server and shuts
+     * down the communication between this instance and the server.
+     * @throws RuntimeException if the server is unreachable
+     */
+    public void doAbort() {
         this.isShuttingDownByWill = true;
-        this.sendMessage(Protocol.ABORT);
+        try {
+            this.sendMessage(Protocol.ABORT);
+        } catch (ServerUnavailableException e) {
+            throw new RuntimeException(e);
+        }
         this.shutdown();
     }
 
     /* ************************************
                       MAIN
     ************************************ */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         System.out.println("Client started.");
 
         Client client = new Client(args);
-        Runtime.getRuntime().addShutdownHook(new Thread(client::onTerminalShutdown));
+        Runtime.getRuntime()
+                .addShutdownHook(new Thread(client::onTerminalShutdown));
         client.init();
     }
 }

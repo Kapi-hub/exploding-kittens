@@ -13,7 +13,7 @@ import java.util.TimerTask;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
 
     /** Socket's Input and Output streams */
     private BufferedReader in;
@@ -26,7 +26,8 @@ public class ClientHandler implements Runnable{
     /** Name of this ClientHandler (name of the connected Client) */
     private String name;
 
-    /** Name of what features does this client support. */
+    /** Name of what features does this instance of client handler
+     *  supports. */
     private boolean supportsChat = false;
     private boolean supportsLobby = false;
     private boolean supportsCombos = false;

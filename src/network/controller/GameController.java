@@ -3,12 +3,10 @@ package network.controller;
 import network.model.*;
 import network.server.ClientHandler;
 import network.server.Server;
-import network.view.TUI;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class GameController {
     private static Scanner userInput = new Scanner(System.in);
@@ -16,7 +14,6 @@ public class GameController {
     private ArrayList<Player> players;
     private Player currentPlayer;
     /** Used for communicating to Server -> ClientHandler -> Client */
-    private TUI view;
     private Server server;
     private final Object gameLock = new Object();
 
@@ -39,7 +36,6 @@ public class GameController {
         }
 
         this.server = server;
-        view = new network.view.TUI(server);
         game = new Game(players, this);
         game.init();
     }
@@ -106,11 +102,6 @@ public class GameController {
         game.doInsertExplode(cardIndex, playerIndex);
     }
 
-    public void askAndSendInputForProcessing() {
-            move = askForInputAsString();
-//        game.processMove(move);
-    }
-
     public void resumeGame() {
         synchronized (gameLock) {
             gameLock.notifyAll();
@@ -125,71 +116,8 @@ public class GameController {
                 game.getCurrentPlayerTurnIndex());
     }
 
-    public void informPlayerKick() {
-        view.promptKickExplodeNoDefuse(currentPlayer.getName());
-    }
-
-    public void informWinner() {
-        view.informWinner(game.getPlayers().get(0).getName());
-    }
-
-    public int askForIntInput() {
-        view.promptInput();
-        return Integer.parseInt(userInput.nextLine());
-    }
-
-    public String askForInputAsString() {
-            view.promptInput();
-            return userInput.nextLine();
-    }
-
     public boolean isClientsTurn(int playerIndexWhoPlayedMove) {
         return game.isClientsTurn(playerIndexWhoPlayedMove);
-    }
-
-    public void raiseWarningWrongInput(String illegalMove) {
-        view.raiseWarningWrongInput(illegalMove);
-        askAndSendInputForProcessing();
-    }
-
-    public void raiseWarningAtExplodePlay() {
-        view.raiseWarningWrongInput("EXPLODE card.");
-        view.raiseWarningAtExplodePlay();
-        askAndSendInputForProcessing();
-    }
-
-    public void raiseWarningAtDefusePlay() {
-        view.raiseWarningWrongInput("DEFUSE card.");
-        view.raiseWarningAtDefusePlay();
-        askAndSendInputForProcessing();
-    }
-
-    public void raiseWarningAtDrawIllegalArgs() {
-        view.raiseWarningWrongInput("draw <arguments>.");
-        view.raiseWarningAtDrawIllegalArgs();
-        askAndSendInputForProcessing();
-    }
-
-    public void promptShuffleConfirmation() {
-        view.promptShuffleConfirmation();
-    }
-
-    public void raiseWarningHasTurnsToStay(int turnsToStay) {
-        view.raiseWarningHasTurnsToStay(turnsToStay);
-    }
-
-    public void promptLeftTurnsToStay(int turnsToStay) {
-        view.promptLeftTurnsToStay(turnsToStay);
-    }
-
-    public void raiseWarningFavorNoThirdArg() {
-        view.raiseWarningFavorNoThirdArg();
-        askAndSendInputForProcessing();
-    }
-
-    public void raiseWarningFavorPlayerNotFound() {
-        view.raiseWarningFavorPlayerNotFound();
-        askAndSendInputForProcessing();
     }
 
     public void promptLastThreeCardsFromDeck(
@@ -211,15 +139,6 @@ public class GameController {
 
     /********** ***************  FROM TUI *************** **/
 
-    /** Mainly used for debugging */
-    public void promptDiscardPile(ArrayList<Card> discardPile) {
-        String discardPileString = discardPile.stream()
-                .map(Card::toString)
-                .collect(Collectors.joining(" | ", "| ", " |"));
-
-        server.doBroadcast("Discard pile : " + discardPileString);
-    }
-
     public void promptDiscardPile(String lastDiscardPileCard) {
         server.doBroadcast("Last discard pile card : " + lastDiscardPileCard);
     }
@@ -233,16 +152,16 @@ public class GameController {
     }
 
     public void printHandAllPlayers() {
-        game.getPlayers().forEach(player -> view.promptPlayerHand(
+        game.getPlayers().forEach(player -> this.promptPlayerHand(
                 player.getName(),
                 player.getHand(),
                 game.getPlayers().indexOf(player)));
     }
 
-    public void printHandTargetPlayer(Player currentPlayer) {
-        view.promptPlayerHand(currentPlayer.getName(),
-                currentPlayer.getHand(),
-                currentPlayerIndex);
+    public void promptPlayerHand(String playerName,
+                                 ArrayList<Card> playerHand,
+                                 int currentPlayerIndex) {
+        server.doPrivate("Your hand: " + playerHand, currentPlayerIndex);
     }
 
     public void printHasFirstMove(int indexPlayerFirstMove) {
@@ -273,14 +192,6 @@ public class GameController {
             String requestingPlayerName) {
         server.askPlayerForCard(targetPlayerIndex,
                 requestingPlayerName);
-    }
-
-    public Object getGameLock() {
-        return gameLock;
-    }
-
-    public Object getClientInsertExplodeLock(int clientHandlerIndex) {
-        return server.getClientInsertExplodeLock(clientHandlerIndex);
     }
 
     public void removePlayerFromGame(int clientHandlerIndex) {

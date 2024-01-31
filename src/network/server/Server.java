@@ -1,11 +1,9 @@
 package network.server;
 
 import network.Protocol.Protocol;
-import network.controller.CardActionCallback;
 import network.controller.GameController;
 import network.exceptions.ClientUnavailableException;
 import network.model.Card;
-import network.model.Player;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -15,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Server implements Runnable{
     /** The ServerSocket of this HotelServer */
@@ -235,7 +232,6 @@ public class Server implements Runnable{
      * Sends a broadcast to all players, except for the one who sent
      * the command to the server, just like in a chat environment.
      * @param message
-     * @param clientHandler
      */
     public void doChatBroadcast(String message, int playerIndex) {
         for (ClientHandler client : clients) {

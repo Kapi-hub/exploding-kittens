@@ -14,5 +14,4 @@ public enum Card {
     POTATO,
     BEARD,
     RAINBOW;
-
 }
