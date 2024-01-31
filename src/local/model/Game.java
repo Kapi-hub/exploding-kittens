@@ -182,6 +182,7 @@ public class Game {
         }
     }
 
+    // Currently known bug: 1 human 4 bots, I play attack, next bot is out, it appears it still need to draw.
     public void processAttackCard() {
         if (!currentPlayer.hasTurnsToStay()) {
             players.get( (currentPlayerIndex + 1) % currentNumberOfPlayers).setTurnsToStay(2);
