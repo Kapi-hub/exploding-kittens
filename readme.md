@@ -14,7 +14,7 @@ Thus, if you want to start the project, you will start only the Server and Clien
 
 **Mention**: There cannot be 2 BOTs playing against eachother. Only Humans vs Humans or Humans vs BOTs. Nevertheless,
 the first player that joins the Server must be a Human player, such that it specifies the number of players to be
-in the game.
+in the game. 
 
 ### STARTING A SERVER
 Before starting a client, you must first start a server. For you to do this, go into the **src.network.server.Server**
